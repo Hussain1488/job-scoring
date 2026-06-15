@@ -1,0 +1,466 @@
+{
+  "name": "Resume Tailor",
+  "nodes": [
+    {
+      "parameters": {
+        "operation": "get",
+        "dataTableId": {
+          "__rl": true,
+          "value": "jlBpo01uxtxcLkFV",
+          "mode": "list",
+          "cachedResultName": "unapplied jobs",
+          "cachedResultUrl": "/projects/QoJ4dLFChNdbj9wb/datatables/jlBpo01uxtxcLkFV"
+        },
+        "matchType": "allConditions",
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "status",
+              "keyValue": "=pending"
+            }
+          ]
+        },
+        "limit": 10
+      },
+      "type": "n8n-nodes-base.dataTable",
+      "typeVersion": 1.1,
+      "position": [
+        -256,
+        -208
+      ],
+      "id": "c192e499-2714-4302-b30c-c458a7cc7503",
+      "name": "Get row(s)"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=You will receive:\n\nJOB\n\n{\nRole: {{ $json.property_role }}\nSalary: {{ $json.property_sallary }},\ntype: {{ $json.property_type }},\nCompany: {{ $json.property_company }},\nLocation: {{ $json.property_location }},\nKey Requirements: {{ $json.property_key_requirements }},\nDescription: {{ $json.property_descriptions }}\n}\n\nRESUME\n\n{\n  \"personalInfo\": {\n    \"name\": \"Hussain Hedayati\",\n    \"title\": \"Software Engineer\",\n    \"subtitle\": \"Software Engineer\",\n    \"phone\": \"+49 176 561 303 13\",\n    \"email\": \"Hussain@hedayat.me\",\n    \"portfolio\": {\n      \"url\": \"https://hedayat.me/\",\n      \"text\": \"www.hedayat.me\"\n    },\n    \"github\": {\n      \"url\": \"https://github.com/hussain1488\",\n      \"text\": \"github.com/hussain1488\"\n    },\n    \"linkedin\": {\n      \"url\": \"https://www.linkedin.com/in/hedayati1488/\",\n      \"text\": \"linkedin.com/in/hedayati1488/\"\n    },\n    \"address\": \"Berlin, Germany\",\n    \"profileImage\": \"/profile/Hussain.JPG\",\n    \"qrCode\": \"/qr-portfolio.svg\",\n    \"workPermit\": \"Valid German Work Permit (Aufenthaltserlaubnis)\"\n  },\n  \"summary\": {\n    \"text\": \"Software Engineer with a Master's in Computer Science and 4+ years of full-stack development experience. Specialized in TypeScript, Node.js, Next.js, and Prisma with deep expertise in RESTful APIs, WebSockets, and microservices architecture. Expert in building scalable enterprise solutions with modern JavaScript ecosystems and cloud deployment. Strong background in e-commerce platforms, web applications, and machine learning projects. Experienced in database design with PostgreSQL and MySQL, API development, testing with Jest, and deployment pipelines with Docker, Kubernetes, Nomad, Terraform, and CI/CD.\",\n    \"highlightedSkills\": [\n      \"Node.js\", \"TypeScript\", \"Next.js\", \"Prisma\",\n      \"Express.js\", \"JavaScript\", \"WebSockets\", \"microservices architecture\",\n      \"RESTful APIs\", \"PostgreSQL\", \"Jest\", \"Docker\", \"Kubernetes\",\n      \"Nomad\", \"Terraform\", \"CI/CD\", \"database design\", \"API development\"\n    ],\n    \"coreCompetencies\": [\n      \"Node.js & Express.js\",\n      \"Next.js\",\n      \"TypeScript & JavaScript\",\n      \"Prisma & database design\",\n      \"REST APIs & WebSockets\",\n      \"Unit & Integration Testing (Jest)\",\n      \"Microservices\",\n      \"Docker & containers\",\n      \"CI/CD (GitHub Actions)\",\n      \"Kubernetes, Nomad, Terraform\",\n      \"RAG, LangChain & n8n\",\n      \"Team lead & mentoring\"\n    ]\n  },\n  \"experience\": [\n    {\n      \"title\": \"Independent Contractor — Software Engineer (End-to-End Delivery)\",\n      \"company\": \"Seebucht Grunewald\",\n      \"location\": \"Berlin, Germany\",\n      \"startDate\": \"Nov 2025\",\n      \"endDate\": \"May 2026\",\n      \"workType\": \"Hybrid\",\n      \"isCurrent\": true,\n      \"isPrimary\": true,\n      \"responsibilities\": [\n        \"Migrated two client websites from WordPress to a fully custom stack (Node.js, Express.js, Next.js), enabling the owner to independently manage events, finances, and all content.\",\n        \"Delivered measurable SEO improvements for both sites — within 2 months of deployment both saw significant growth in search rankings and visitor traffic.\",\n        \"Owned the full delivery lifecycle as sole engineer: architecture, development, testing (Jest), DevOps (Docker, Nomad, Traefik, CI/CD), and post-launch production operations.\"\n      ]\n    },\n    {\n      \"title\": \"Team Lead — Full Stack Developer\",\n      \"company\": \"Upper Company\",\n      \"location\": \"Mashhad, Iran\",\n      \"startDate\": \"Apr 2024\",\n      \"endDate\": \"Apr 2025\",\n      \"workType\": \"On-site\",\n      \"isCurrent\": false,\n      \"isPrimary\": false,\n      \"promotion\": true,\n      \"responsibilities\": [\n        \"Promoted to Team Lead after 6 months — led a team of 3 developers to modernize a legacy platform, contributing to a 50% increase in online sales within 6 months.\",\n        \"Designed and built a financial service module integrated with the client's physical shop using queue-based API synchronization and automatic retry mechanisms.\",\n        \"Implemented CI/CD pipelines with GitHub Actions, Docker-based deployments, Jest testing standards, and code review processes across the team.\"\n      ]\n    },\n    {\n      \"title\": \"Full Stack Developer\",\n      \"company\": \"Upper Company\",\n      \"location\": \"Mashhad, Iran\",\n      \"startDate\": \"Oct 2023\",\n      \"endDate\": \"Apr 2024\",\n      \"workType\": \"On-site\",\n      \"isCurrent\": false,\n      \"isPrimary\": false,\n      \"responsibilities\": [\n        \"Built and maintained full-stack features for a legacy e-commerce platform using Laravel, and MySQL.\",\n        \"Optimized REST APIs and database design; contributed to architecture decisions that laid the foundation for the platform rebuild.\"\n      ]\n    },\n    {\n      \"title\": \"Independent Contractor — Full Stack Developer (Freelance, Parallel)\",\n      \"company\": \"Tara Solutions\",\n      \"location\": \"Remote\",\n      \"startDate\": \"Oct 2023\",\n      \"endDate\": \"Dec 2024\",\n      \"workType\": \"Remote\",\n      \"isCurrent\": false,\n      \"isPrimary\": false,\n      \"responsibilities\": [\n        \"Delivered 8 projects across e-commerce platforms, REST APIs, and internal business tools — handling feature development, version upgrades, and system improvements.\",\n        \"Built and maintained applications using TypeScript, Node.js, Express.js, Next.js, Laravel, Docker, Kubernetes, and Nomad infrastructure; maintained code quality through Jest unit and integration tests.\"\n      ]\n    },\n    {\n      \"title\": \"Junior Back-end Developer\",\n      \"company\": \"Code9ine Company\",\n      \"location\": \"Kabul, Afghanistan\",\n      \"startDate\": \"Jan 2022\",\n      \"endDate\": \"Dec 2022\",\n      \"workType\": \"On-site\",\n      \"isCurrent\": false,\n      \"isPrimary\": false,\n      \"responsibilities\": [\n        \"Backend features for client websites using Laravel, PHP, next.js, express.js, PostgreSQL, and MySQL — API development, database integration, and performance optimization.\"\n      ]\n    }\n  ],\n  \"education\": [\n    {\n      \"degree\": \"Master in Computer Science\",\n      \"institution\": \"GISMA University of Applied Sciences\",\n      \"startDate\": \"Oct 2024\",\n      \"endDate\": \"Sep 2025\",\n      \"isCurrent\": true,\n      \"details\": [\n        {\n          \"type\": \"Thesis\",\n          \"text\": \"Fake News Detection using Deep Learning — 98% accuracy with best balanced F1 and recall.\"\n        },\n        {\n          \"type\": \"Core Subjects\",\n          \"text\": \"Machine Learning, Data Science, Advanced Database, Advanced Mathematics, Python, Java.\"\n        },\n        {\n          \"type\": \"Research\",\n          \"text\": \"Leveraging Generative AI for Requirement Gathering in Software Startups.\"\n        }\n      ]\n    },\n    {\n      \"degree\": \"Bachelor in Computer Science\",\n      \"institution\": \"Balkh University\",\n      \"startDate\": \"2017\",\n      \"endDate\": \"2022\",\n      \"isCurrent\": false,\n      \"details\": []\n    }\n  ],\n  \"projects\": [\n    {\n      \"title\": \"Boat Event Management System\",\n      \"description\": \"Event management platform with Node.js, Express.js, and Next.js. Features: REST APIs, WebSockets, Stripe payments, Mailchimp, and SEO. Unit and integration tested with Jest. Deployed on Linux with Docker, Nomad, Traefik, Consul, and GitHub Actions CI/CD.\",\n      \"url\": \"https://boot-events.com\",\n      \"technologies\": [\n        \"Node.js\", \"nest.js\", \"Next.js\", \"MySQL\", \"Docker\",\n        \"REST APIs & Webhooks\", \"WebSockets\", \"Stripe Payment Gateway\",\n        \"Jest\", \"Linux Server (Ubuntu)\", \"Nomad\", \"Traefik\",\n        \"Consul\", \"CI/CD (GitHub Actions)\", \"Mailchimp\", \"SEO\"\n      ]\n    },\n    {\n      \"title\": \"Seebucht Grunewald — Company Website\",\n      \"description\": \"Corporate web app built from scratch with Node.js, Express.js, Next.js, Prisma, and PostgreSQL. REST APIs, WebSockets, Jest testing, CI/CD, and Nomad orchestration — owned end-to-end.\",\n      \"url\": \"https://seebucht-grunewald.de\",\n      \"technologies\": [\n        \"Node.js\", \"Express.js\", \"Next.js\", \"Prisma\", \"PostgreSQL\",\n        \"REST APIs\", \"WebSockets\", \"Jest\", \"Docker\",\n        \"Linux Server (Ubuntu)\", \"Nomad\", \"Traefik\", \"CI/CD (GitHub Actions)\"\n      ]\n    },\n    {\n      \"title\": \"Website Development & Improvement — Styleziba\",\n      \"description\": \"Rebuilt e-commerce platform with Laravel, express.js, vue.js, and Next.js,. Added installments, payments, staff tools, advanced search, SEO, caching, queues, and media processing.\",\n      \"url\": \"https://styleziba.com (currently unavailable due to regional internet restrictions in Iran)\",\n      \"technologies\": [\n        \"Laravel\", \"Next.js\", \"express.js\", \"Vue 3\", \"REST APIs\",\n        \"Cron & Queues\", \"Performance\", \"Caching\", \"DB Tuning\", \"SEO\"\n      ]\n    },\n    {\n      \"title\": \"Al-taqwa University\",\n      \"description\": \"Upgraded backend from Laravel 5 to Laravel 11. Added role-based access control, improved security, performance, SEO, and modernized database design.\",\n      \"url\": \"https://altaqwa.edu.af/\",\n      \"technologies\": [\n        \"Laravel 11\", \"next.js\", \"Role-Based Permissions\",\n        \"Security\", \"Performance\", \"SEO\", \"Database Design\"\n      ]\n    }\n  ],\n  \"skills\": {\n    \"programmingLanguages\": [\n      \"Node.js\", \"TypeScript\", \"JavaScript\",\n      \"Python\", \"PHP\", \"Java\", \"SQL\"\n    ],\n    \"frameworksLibraries\": [\n      \"Next.js\", \"Express.js\", \"Prisma\", \"React.js\",\n      \"Laravel\", \"Vue 3\", \"Tailwind CSS\", \"HTML5/CSS/SCSS\"\n    ],\n    \"testing\": [\n      \"Jest\", \"Unit Testing\", \"Integration Testing\"\n    ],\n    \"databasesStorage\": [\n      \"PostgreSQL\", \"MySQL\", \"MongoDB\"\n    ],\n    \"cloudDevOps\": [\n      \"Docker\", \"Kubernetes\", \"Nomad\", \"Terraform\",\n      \"Traefik\", \"Consul\", \"Git\", \"CI/CD (GitHub Actions)\",\n      \"Linux Server (Ubuntu)\"\n    ],\n    \"architectureMethods\": [\n      \"Microservices\", \"RESTful APIs\", \"WebSockets\",\n      \"Webhooks\", \"MVC\", \"Object-Oriented Programming\", \"API Design\"\n    ]\n  },\n  \"languages\": [\n    { \"name\": \"Persian\", \"level\": \"Native\" },\n    { \"name\": \"English\", \"level\": \"Fluent (C1)\" },\n    { \"name\": \"German\", \"level\": \"B2 (recently completed — actively improving)\" }\n  ],\n  \"softSkills\": [\n    \"Leadership\", \"Problem Solving\", \"Communication\",\n    \"Time Management\", \"Adaptability\", \"Critical Thinking\",\n    \"Project Management\", \"Mentoring\", \"Strategic Planning\",\n    \"Cross-functional Teamwork\"\n  ],\n  \"references\": [\n    {\n      \"name\": \"Abbas Ataie\",\n      \"position\": \"CEO\",\n      \"company\": \"Tara Solutions\",\n      \"email\": \"info@tarasolutions.cloud\",\n      \"phone\": \"+93 70 306 4120\"\n    },\n    {\n      \"name\": \"Morteza Dastani\",\n      \"position\": \"CEO\",\n      \"company\": \"Upper Company\",\n      \"email\": \"info@styleziba.com\",\n      \"phone\": \"+98 915 143 5000\"\n    },\n    {\n      \"name\": \"Stratis Efthymiou\",\n      \"position\": \"Professor\",\n      \"company\": \"GISMA University of Applied Sciences\",\n      \"email\": \"Stratis.Efthymiou@gisma-education.com\",\n      \"phone\": \"\"\n    }\n  ]\n}\n\nTASK\n\nOptimize this resume for the job.\n\nFollow all system rules.\n\nReturn only the updated JSON.",
+        "options": {
+          "systemMessage": "You are an ATS resume optimization engine for German tech jobs.\n\nYou receive a job description and a JSON resume.\n\nYour task is to improve ATS match while keeping the resume truthful.\n\nHARD RULES\n1. Keep exact JSON structure.\n2. Only change values.\n3. Output ONLY valid JSON.\n4. No markdown wrappers, no conversational text, no explanations.\n5. LENGTH LOCK: The optimized JSON output must have equal or fewer characters than the input JSON. Do not add new bullet points, do not lengthen existing strings, and do not introduce verbose descriptions. Keep descriptions concise, punchy, and direct.\n\nSTACK LOCK RULE\nNever remove or replace:\n- Node.js\n- TypeScript\n- JavaScript\n- Next.js\n- Express.js\n- PostgreSQL\n- MySQL\n- Docker\nThese must always stay in the resume.\n\nYou may:\n- reorder skills to match the job description's priority\n- adjust phrasing emphasis within existing context\n- align wording directly with German job requirements\n\nOPTIMIZATION GOAL\nMaximize ATS match for German hiring systems:\n- keyword alignment\n- role match\n- tech stack overlap\n- clarity and structure\n\nSTYLE RULE\n- Factual, simple, and direct.\n- No hype language, no exaggeration, and no marketing buzzwords."
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        464,
+        -192
+      ],
+      "id": "20718654-f3a7-4999-a411-87c4bd9295be",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "resource": "databasePage",
+        "operation": "get",
+        "pageId": {
+          "__rl": true,
+          "value": "={{ $json.notion_id }}",
+          "mode": "id"
+        }
+      },
+      "type": "n8n-nodes-base.notion",
+      "typeVersion": 2.2,
+      "position": [
+        256,
+        -192
+      ],
+      "id": "eaa16617-53e2-4bf7-8c25-b3bd47f5773b",
+      "name": "Get a database page",
+      "credentials": {
+        "notionApi": {
+          "id": "GlORpKOl4mqhuKtY",
+          "name": "Notion account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "value": "gpt-5.4",
+          "mode": "list",
+          "cachedResultName": "gpt-5.4"
+        },
+        "builtInTools": {},
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.3,
+      "position": [
+        416,
+        32
+      ],
+      "id": "7941f1e1-4bca-4bdb-8899-2026bd0890dc",
+      "name": "OpenAI Chat Model",
+      "credentials": {
+        "openAiApi": {
+          "id": "rZgYXor1KsCWA5YC",
+          "name": "OpenAI account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// 1. Grab the raw text string from the AI node output\nconst rawText = $input.first().json.output;\n\ntry {\n  // 2. Parse the string into a real, functional JavaScript object\n  const resumeObj = JSON.parse(rawText);\n\n  // 3. Convert it back into a human-readable string with proper indentation (2 spaces)\n  const jsonString = JSON.stringify(resumeObj, null, 2);\n\n  // 4. Convert that text string into an n8n binary file buffer\n  const binaryData = Buffer.from(jsonString, 'utf-8');\n\n  // Find the company name dynamically, or fallback to the second job role if the first isn't populated\n  const company = resumeObj.experience?.[0]?.company || \"Tailored-Job\";\n\n  return {\n    json: {\n      companyName: company,\n      status: \"success\"\n    },\n    binary: {\n      data: {\n        data: binaryData.toString('base64'),\n        mimeType: 'application/json',\n        fileName: `${$('Get row(s)').first().json.id}_resume.json` // Cleans filename (e.g. Stripe_resume.json)\n      }\n    }\n  };\n\n} catch (error) {\n  // Safe fallback case if the AI returns broken markdown or invalid JSON syntax\n  const fallbackBinary = Buffer.from(rawText, 'utf-8');\n  return {\n    json: {\n      companyName: \"Error-Raw-Text\",\n      error: \"Failed to parse AI response into valid JSON structure\",\n      details: error.message\n    },\n    binary: {\n      data: {\n        data: fallbackBinary.toString('base64'),\n        mimeType: 'text/plain',\n        fileName: 'raw_ai_output.txt'\n      }\n    }\n  };\n}"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        768,
+        64
+      ],
+      "id": "bdb126b1-d353-4430-af34-ff357d4c43ac",
+      "name": "Code in JavaScript1"
+    },
+    {
+      "parameters": {
+        "inputDataFieldName": "=data",
+        "name": "={{ $('Loop Over Items').item.json.id+\"_resume.json\" }}",
+        "driveId": {
+          "__rl": true,
+          "value": "My Drive",
+          "mode": "list",
+          "cachedResultName": "My Drive",
+          "cachedResultUrl": "https://drive.google.com/drive/my-drive"
+        },
+        "folderId": {
+          "__rl": true,
+          "value": "1855D1BZ2A7pkjfBdBrFwYlfo4258cOGc",
+          "mode": "list",
+          "cachedResultName": "Resume",
+          "cachedResultUrl": "https://drive.google.com/drive/folders/1855D1BZ2A7pkjfBdBrFwYlfo4258cOGc"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        976,
+        64
+      ],
+      "id": "74493a7a-c09a-4566-8832-9e9c1d67e3f3",
+      "name": "Upload file",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "qqtSKIqdBfziZpTi",
+          "name": "Google Drive account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        -16,
+        -208
+      ],
+      "id": "3ccf4498-1339-4275-abca-64fdc1ad4844",
+      "name": "Loop Over Items"
+    },
+    {
+      "parameters": {
+        "resource": "databasePage",
+        "operation": "update",
+        "pageId": {
+          "__rl": true,
+          "value": "={{ $('Loop Over Items').item.json.notion_id }}",
+          "mode": "id"
+        },
+        "propertiesUi": {
+          "propertyValues": [
+            {
+              "key": "resume|url",
+              "urlValue": "={{ $json.webViewLink }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.notion",
+      "typeVersion": 2.2,
+      "position": [
+        1184,
+        64
+      ],
+      "id": "0ef3e491-2d20-4d53-bb22-9883b79679f8",
+      "name": "Update a database page",
+      "credentials": {
+        "notionApi": {
+          "id": "GlORpKOl4mqhuKtY",
+          "name": "Notion account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "chatId": "=7494071968",
+        "text": "=Resume tailored successfully and stored in google drive. you can find it in: {{ $('Upload file').item.json.webViewLink }}",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        1600,
+        64
+      ],
+      "id": "86f6ba37-4c36-4595-a92a-f17d9357fbea",
+      "name": "Send a text message",
+      "webhookId": "68c838b9-6d12-4330-9880-1dc913a1f8e4",
+      "credentials": {
+        "telegramApi": {
+          "id": "we8v4FRhpEXNgrvh",
+          "name": "Telegram account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "dataTableId": {
+          "__rl": true,
+          "value": "jlBpo01uxtxcLkFV",
+          "mode": "list",
+          "cachedResultName": "unapplied jobs",
+          "cachedResultUrl": "/projects/QoJ4dLFChNdbj9wb/datatables/jlBpo01uxtxcLkFV"
+        },
+        "filters": {
+          "conditions": [
+            {
+              "keyValue": "={{ $('Loop Over Items').item.json.id }}"
+            }
+          ]
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "status": "done"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "notion_id",
+              "displayName": "notion_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "fitness_score",
+              "displayName": "fitness_score",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "job_url",
+              "displayName": "job_url",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "notion_url",
+              "displayName": "notion_url",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "status",
+              "displayName": "status",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.dataTable",
+      "typeVersion": 1.1,
+      "position": [
+        1392,
+        64
+      ],
+      "id": "6a67d822-e566-4965-9e68-d46e241802f0",
+      "name": "Update row(s)"
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "hours",
+              "triggerAtMinute": 40
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.3,
+      "position": [
+        -432,
+        -208
+      ],
+      "id": "03aea814-b361-4e5c-9470-6b864756dcdd",
+      "name": "Schedule Trigger"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Get row(s)": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get a database page": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript1": {
+      "main": [
+        [
+          {
+            "node": "Upload file",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Upload file": {
+      "main": [
+        [
+          {
+            "node": "Update a database page",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Loop Over Items": {
+      "main": [
+        [],
+        [
+          {
+            "node": "Get a database page",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Update a database page": {
+      "main": [
+        [
+          {
+            "node": "Update row(s)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send a text message": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Update row(s)": {
+      "main": [
+        [
+          {
+            "node": "Send a text message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "Get row(s)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "versionId": "166beb26-8fbf-4bc3-a286-942836e9d8c9",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "183e61f757ad2aded29deeea0bd8682b75b0c10c8d3acb86f3b90fa6e1dc1da1"
+  },
+  "id": "T3Dk02qAhAjcjqsL",
+  "tags": []
+}
