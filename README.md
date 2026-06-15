@@ -383,11 +383,7 @@ without fabricating experience.
 
 ## Resume Matching
 
-![Resume Matching](screenshots/resume-matching.png)
-
-## Tailored Resume
-
-![Tailored Resume](screenshots/tailored-resume.png)
+![Resume Matching](screenshots/resume-tailoring-workflow.png)
 
 ---
 
