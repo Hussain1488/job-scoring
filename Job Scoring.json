@@ -1,0 +1,1685 @@
+{
+  "name": "Job Scoring",
+  "nodes": [
+    {
+      "parameters": {
+        "updates": [
+          "message"
+        ],
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegramTrigger",
+      "typeVersion": 1.3,
+      "position": [
+        -832,
+        688
+      ],
+      "id": "8e6c9694-1b07-4ede-96cd-65c02a635628",
+      "name": "Telegram Trigger",
+      "webhookId": "31e068ce-741c-4fe6-ac54-e2c810e78417",
+      "credentials": {
+        "telegramApi": {
+          "id": "Sy4wZgtp4HHEp5ng",
+          "name": "Telegram account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "92bb75b2-4739-4563-a867-62ba62ed2064",
+              "leftValue": "={{ $json.message.text }}",
+              "rightValue": "https",
+              "operator": {
+                "type": "string",
+                "operation": "startsWith"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        -608,
+        688
+      ],
+      "id": "e065a187-f9e3-498a-bad7-be885a72183b",
+      "name": "If"
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $('Telegram Trigger').item.json.message.chat.id }}",
+        "text": "Please send a valid Job Posting Url!",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        -384,
+        784
+      ],
+      "id": "49e794ae-61d1-440d-b503-1f52b2de8ea8",
+      "name": "Send a text message",
+      "webhookId": "f02cd296-7da2-443b-a8e5-192a90f06410",
+      "credentials": {
+        "telegramApi": {
+          "id": "Sy4wZgtp4HHEp5ng",
+          "name": "Telegram account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "modelName": "models/gemini-3.5-flash",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1.1,
+      "position": [
+        -256,
+        -272
+      ],
+      "id": "4298f312-7a27-4dd8-881b-75261e4f955a",
+      "name": "Google Gemini Chat Model",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "xd0FNDAe4Nsw03QY",
+          "name": "ZarTech Default"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "74419cf9-ed70-4969-a0a2-54db8f5b853a",
+              "leftValue": "={{ Number($json.resume_matching) }}",
+              "rightValue": 70,
+              "operator": {
+                "type": "number",
+                "operation": "gte"
+              }
+            },
+            {
+              "id": "60f3bf15-63fe-47a1-bcaa-dd72a50a7e64",
+              "leftValue": "={{ $json.posting_date && DateTime.fromFormat($json.posting_date, 'dd/MM/yyyy') }}",
+              "rightValue": "={{ $now.minus({days: 7}) }}",
+              "operator": {
+                "type": "dateTime",
+                "operation": "afterOrEquals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        240,
+        -496
+      ],
+      "id": "56c0a47e-4c47-4269-be79-4bee0fef8513",
+      "name": "If1"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Map through ALL items coming from the previous node\nreturn $input.all().map(item => {\n    const rawText = item.json.output;\n    \n    try {\n        // Parse the JSON string into a real JavaScript object\n        const cleanJson = JSON.parse(rawText);\n        \n        // Return the parsed data alongside any other existing fields (like chat_id!)\n        return {\n            json: {\n                ...item.json, // preserves chat_id, url, etc.\n                ...cleanJson  // adds the newly parsed AI properties\n            }\n        };\n    } catch (error) {\n        // Fallback in case the AI format breaks on an item\n        return { \n            json: { \n                ...item.json,\n                error: \"Failed to parse AI response\", \n                raw: rawText \n            } \n        };\n    }\n});"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        16,
+        -496
+      ],
+      "id": "f74a76fc-7899-4dc6-9b38-1401c19fbc1c",
+      "name": "Code in JavaScript"
+    },
+    {
+      "parameters": {
+        "resource": "databasePage",
+        "databaseId": {
+          "__rl": true,
+          "value": "5f8c38c8-febe-82e8-99e0-012f4388b9ff",
+          "mode": "list",
+          "cachedResultName": "Jobs",
+          "cachedResultUrl": "https://app.notion.com/p/5f8c38c8febe82e899e0012f4388b9ff"
+        },
+        "propertiesUi": {
+          "propertyValues": [
+            {
+              "key": "Company|rich_text",
+              "textContent": "={{ $json.company }}"
+            },
+            {
+              "key": "Descriptions|rich_text",
+              "textContent": "={{ $json.description }}"
+            },
+            {
+              "key": "Job posting|url",
+              "urlValue": "={{ $('Loop Over Items1').item.json.job_posting_url }}"
+            },
+            {
+              "key": "key_requirements|rich_text",
+              "textContent": "={{ $('Code in JavaScript').item.json.key_requirements.join(', ') }}"
+            },
+            {
+              "key": "Location|rich_text",
+              "textContent": "={{ $('Code in JavaScript').item.json.location }}"
+            },
+            {
+              "key": "Role|title",
+              "title": "={{ $('Code in JavaScript').item.json.role }}"
+            },
+            {
+              "key": "Sallary|rich_text",
+              "textContent": "={{ $('Code in JavaScript').item.json.salary || \"\" }}"
+            },
+            {
+              "key": "Status|select",
+              "selectValue": "=Not applied"
+            },
+            {
+              "key": "type|select",
+              "selectValue": "={{ $json.type }}"
+            },
+            {
+              "key": "Fitness Score|rich_text",
+              "textContent": "={{ $json.resume_matching.toString() }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.notion",
+      "typeVersion": 2.2,
+      "position": [
+        464,
+        -592
+      ],
+      "id": "b79eee55-cfcf-4a7f-833f-e9178eb77219",
+      "name": "Create a database page",
+      "credentials": {
+        "notionApi": {
+          "id": "GlORpKOl4mqhuKtY",
+          "name": "Notion account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "chatId": "=7494071968",
+        "text": "Job Created Success fully",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        912,
+        -592
+      ],
+      "id": "03cdec95-fd4c-44a7-8b3d-9fd6b664eb75",
+      "name": "Send a text message2",
+      "webhookId": "0d88edcd-22bf-4f29-9ef5-050f79475c73",
+      "credentials": {
+        "telegramApi": {
+          "id": "Sy4wZgtp4HHEp5ng",
+          "name": "Telegram account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "dataTableId": {
+          "__rl": true,
+          "value": "jlBpo01uxtxcLkFV",
+          "mode": "list",
+          "cachedResultName": "unapplied jobs",
+          "cachedResultUrl": "/projects/QoJ4dLFChNdbj9wb/datatables/jlBpo01uxtxcLkFV"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "notion_id": "={{ $json.id }}",
+            "fitness_score": "={{ $json.property_fitness_score }}",
+            "job_url": "={{ $json.property_job_posting }}",
+            "notion_url": "={{ $json.url }}",
+            "status": "pending"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "notion_id",
+              "displayName": "notion_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "fitness_score",
+              "displayName": "fitness_score",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "job_url",
+              "displayName": "job_url",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "notion_url",
+              "displayName": "notion_url",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "status",
+              "displayName": "status",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false,
+          "column": [
+            {
+              "name": "notion_id"
+            },
+            {
+              "name": "fitness_score"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.dataTable",
+      "typeVersion": 1.1,
+      "position": [
+        688,
+        -592
+      ],
+      "id": "47fd4b7c-f957-41d5-a3b7-124565d7c728",
+      "name": "Insert row"
+    },
+    {
+      "parameters": {
+        "dataTableId": {
+          "__rl": true,
+          "value": "tj3WGfCBh287XxSr",
+          "mode": "list",
+          "cachedResultName": "url queue",
+          "cachedResultUrl": "/projects/QoJ4dLFChNdbj9wb/datatables/tj3WGfCBh287XxSr"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "job_posting_url": "={{ $json.message.text }}",
+            "status": "pending"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "job_posting_url",
+              "displayName": "job_posting_url",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "status",
+              "displayName": "status",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.dataTable",
+      "typeVersion": 1.1,
+      "position": [
+        -272,
+        560
+      ],
+      "id": "8162b286-dd1c-466f-a7c9-f69494bfe94a",
+      "name": "Insert row1"
+    },
+    {
+      "parameters": {
+        "options": {
+          "reset": false
+        }
+      },
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        304,
+        160
+      ],
+      "id": "d4bb206b-bfc9-43cc-9db3-d033dd0354d3",
+      "name": "Loop Over Items"
+    },
+    {
+      "parameters": {
+        "chatId": "7494071968",
+        "text": "=The job match score is blow the defined or job posing time is older than 7 days.\njob url: {{ $('Loop Over Items1').item.json.job_posting_url }}",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        912,
+        -400
+      ],
+      "id": "8f3285b3-4db3-44b3-8575-548773fbdcd7",
+      "name": "Send a text message1",
+      "webhookId": "eef75d91-1563-4b94-839a-968774321d7a",
+      "credentials": {
+        "telegramApi": {
+          "id": "Sy4wZgtp4HHEp5ng",
+          "name": "Telegram account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "dataTableId": {
+          "__rl": true,
+          "value": "tj3WGfCBh287XxSr",
+          "mode": "list",
+          "cachedResultName": "url queue",
+          "cachedResultUrl": "/projects/QoJ4dLFChNdbj9wb/datatables/tj3WGfCBh287XxSr"
+        },
+        "filters": {
+          "conditions": [
+            {
+              "keyValue": "={{ $('Loop Over Items1').item.json.id }}"
+            }
+          ]
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "status": "Done"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "job_posting_url",
+              "displayName": "job_posting_url",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "status",
+              "displayName": "status",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.dataTable",
+      "typeVersion": 1.1,
+      "position": [
+        1280,
+        -304
+      ],
+      "id": "b18e14b0-0841-481a-bec6-4f6edca0e78b",
+      "name": "Update row(s)"
+    },
+    {
+      "parameters": {
+        "jsCode": "return $input.all().map(item => {\n    // 1. Traverse deeply to safely find Firecrawl's markdown string\n    let text = \"\";\n    if (item.json.data && item.json.data.markdown) {\n        text = item.json.data.markdown;\n    } else {\n        text = item.json.markdown || item.json.text || \"\";\n    }\n\n    if (text) {\n        // 2. Wipe out any Base64 encoded images/SVGs completely (Wipes the massive token-bloat blocks)\n        text = text.replace(/data:image\\/[^;]+;base64,[A-Za-z0-9+/=\\s\\n\\r]+/g, '');\n\n        // 3. Wipe out standard inline Markdown image formats: ![alt](url)\n        text = text.replace(/!\\[.*?\\]\\(.*?\\)/g, '');\n\n        // 4. Wipe out raw inline HTML graphics tags\n        text = text.replace(/<svg[\\s\\S]*?<\\/svg>/g, '');\n        text = text.replace(/<img[\\s\\S]*?>/g, '');\n\n        // 5. Clean up tracking blocks or messy remnants from broken tags\n        text = text.replace(/data:image\\/svg\\+xml[\\s\\S]+?%3E%0A\\)/g, '');\n    }\n\n    // 6. OVERWRITE the original paths entirely.\n    // This way, your downstream Gemini prompt will naturally use the clean text without breaking.\n    let updatedJson = { ...item.json };\n    \n    if (updatedJson.data && updatedJson.data.markdown) {\n        updatedJson.data.markdown = text.trim();\n    } else {\n        updatedJson.markdown = text.trim();\n    }\n\n    return { json: updatedJson };\n});"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        752,
+        160
+      ],
+      "id": "30b14a00-f67e-4d4b-bd31-45c9297d9417",
+      "name": "Code in JavaScript1"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=\"job\": {{ $json.llm_description ?? $json.description }},\n\"Resume\":{\n  \"personalInfo\": {\n    \"name\": \"Hussain Hedayati\",\n    \"title\": \"Software Engineer\",\n    \"subtitle\": \"Software Engineer\",\n    \"phone\": \"+49 176 561 303 13\",\n    \"email\": \"Hussain@hedayat.me\",\n    \"portfolio\": {\n      \"url\": \"https://hedayat.me/\",\n      \"text\": \"www.hedayat.me\"\n    },\n    \"github\": {\n      \"url\": \"https://github.com/hussain1488\",\n      \"text\": \"github.com/hussain1488\"\n    },\n    \"linkedin\": {\n      \"url\": \"https://www.linkedin.com/in/hedayati1488/\",\n      \"text\": \"linkedin.com/in/hedayati1488/\"\n    },\n    \"address\": \"Berlin, Germany\",\n    \"profileImage\": \"/profile/Hussain.JPG\",\n    \"qrCode\": \"/qr-portfolio.svg\",\n    \"workPermit\": \"Valid German Work Permit (Aufenthaltserlaubnis)\"\n  },\n  \"summary\": {\n    \"text\": \"Software Engineer with a Master's in Computer Science and 4+ years of full-stack development experience. Specialized in TypeScript, Node.js, Next.js, and Prisma with deep expertise in RESTful APIs, WebSockets, and microservices architecture. Expert in building scalable enterprise solutions with modern JavaScript ecosystems and cloud deployment. Strong background in e-commerce platforms, web applications, and machine learning projects. Experienced in database design with PostgreSQL and MySQL, API development, testing with Jest, and deployment pipelines with Docker, Kubernetes, Nomad, Terraform, and CI/CD.\",\n    \"highlightedSkills\": [\n      \"Node.js\", \"TypeScript\", \"Next.js\", \"Prisma\",\n      \"Express.js\", \"JavaScript\", \"WebSockets\", \"microservices architecture\",\n      \"RESTful APIs\", \"PostgreSQL\", \"Jest\", \"Docker\", \"Kubernetes\",\n      \"Nomad\", \"Terraform\", \"CI/CD\", \"database design\", \"API development\"\n    ],\n    \"coreCompetencies\": [\n      \"Node.js & Express.js\",\n      \"Next.js\",\n      \"TypeScript & JavaScript\",\n      \"Prisma & database design\",\n      \"REST APIs & WebSockets\",\n      \"Unit & Integration Testing (Jest)\",\n      \"Microservices\",\n      \"Docker & containers\",\n      \"CI/CD (GitHub Actions)\",\n      \"Kubernetes, Nomad, Terraform\",\n      \"RAG, LangChain & n8n\",\n      \"Team lead & mentoring\"\n    ]\n  },\n  \"experience\": [\n    {\n      \"title\": \"Independent Contractor — Software Engineer (End-to-End Delivery)\",\n      \"company\": \"Seebucht Grunewald\",\n      \"location\": \"Berlin, Germany\",\n      \"startDate\": \"Nov 2025\",\n      \"endDate\": \"May 2026\",\n      \"workType\": \"Hybrid\",\n      \"isCurrent\": true,\n      \"isPrimary\": true,\n      \"responsibilities\": [\n        \"Migrated two client websites from WordPress to a fully custom stack (Node.js, Express.js, Next.js), enabling the owner to independently manage events, finances, and all content.\",\n        \"Delivered measurable SEO improvements for both sites — within 2 months of deployment both saw significant growth in search rankings and visitor traffic.\",\n        \"Owned the full delivery lifecycle as sole engineer: architecture, development, testing (Jest), DevOps (Docker, Nomad, Traefik, CI/CD), and post-launch production operations.\"\n      ]\n    },\n    {\n      \"title\": \"Team Lead — Full Stack Developer\",\n      \"company\": \"Upper Company\",\n      \"location\": \"Mashhad, Iran\",\n      \"startDate\": \"Apr 2024\",\n      \"endDate\": \"Apr 2025\",\n      \"workType\": \"On-site\",\n      \"isCurrent\": false,\n      \"isPrimary\": false,\n      \"promotion\": true,\n      \"responsibilities\": [\n        \"Promoted to Team Lead after 6 months — led a team of 3 developers to modernize a legacy platform, contributing to a 50% increase in online sales within 6 months.\",\n        \"Designed and built a financial service module integrated with the client's physical shop using queue-based API synchronization and automatic retry mechanisms.\",\n        \"Implemented CI/CD pipelines with GitHub Actions, Docker-based deployments, Jest testing standards, and code review processes across the team.\"\n      ]\n    },\n    {\n      \"title\": \"Full Stack Developer\",\n      \"company\": \"Upper Company\",\n      \"location\": \"Mashhad, Iran\",\n      \"startDate\": \"Oct 2023\",\n      \"endDate\": \"Apr 2024\",\n      \"workType\": \"On-site\",\n      \"isCurrent\": false,\n      \"isPrimary\": false,\n      \"responsibilities\": [\n        \"Built and maintained full-stack features for a legacy e-commerce platform using Laravel, and MySQL.\",\n        \"Optimized REST APIs and database design; contributed to architecture decisions that laid the foundation for the platform rebuild.\"\n      ]\n    },\n    {\n      \"title\": \"Independent Contractor — Full Stack Developer (Freelance, Parallel)\",\n      \"company\": \"Tara Solutions\",\n      \"location\": \"Remote\",\n      \"startDate\": \"Oct 2023\",\n      \"endDate\": \"Dec 2024\",\n      \"workType\": \"Remote\",\n      \"isCurrent\": false,\n      \"isPrimary\": false,\n      \"responsibilities\": [\n        \"Delivered 8 projects across e-commerce platforms, REST APIs, and internal business tools — handling feature development, version upgrades, and system improvements.\",\n        \"Built and maintained applications using TypeScript, Node.js, Express.js, Next.js, Laravel, Docker, Kubernetes, and Nomad infrastructure; maintained code quality through Jest unit and integration tests.\"\n      ]\n    },\n    {\n      \"title\": \"Junior Back-end Developer\",\n      \"company\": \"Code9ine Company\",\n      \"location\": \"Kabul, Afghanistan\",\n      \"startDate\": \"Jan 2022\",\n      \"endDate\": \"Dec 2022\",\n      \"workType\": \"On-site\",\n      \"isCurrent\": false,\n      \"isPrimary\": false,\n      \"responsibilities\": [\n        \"Backend features for client websites using Laravel, PHP, next.js, express.js, PostgreSQL, and MySQL — API development, database integration, and performance optimization.\"\n      ]\n    }\n  ],\n  \"education\": [\n    {\n      \"degree\": \"Master in Computer Science\",\n      \"institution\": \"GISMA University of Applied Sciences\",\n      \"startDate\": \"Oct 2024\",\n      \"endDate\": \"Sep 2025\",\n      \"isCurrent\": true,\n      \"details\": [\n        {\n          \"type\": \"Thesis\",\n          \"text\": \"Fake News Detection using Deep Learning — 98% accuracy with best balanced F1 and recall.\"\n        },\n        {\n          \"type\": \"Core Subjects\",\n          \"text\": \"Machine Learning, Data Science, Advanced Database, Advanced Mathematics, Python, Java.\"\n        },\n        {\n          \"type\": \"Research\",\n          \"text\": \"Leveraging Generative AI for Requirement Gathering in Software Startups.\"\n        }\n      ]\n    },\n    {\n      \"degree\": \"Bachelor in Computer Science\",\n      \"institution\": \"Balkh University\",\n      \"startDate\": \"2017\",\n      \"endDate\": \"2022\",\n      \"isCurrent\": false,\n      \"details\": []\n    }\n  ],\n  \"projects\": [\n    {\n      \"title\": \"Boat Event Management System\",\n      \"description\": \"Event management platform with Node.js, Express.js, and Next.js. Features: REST APIs, WebSockets, Stripe payments, Mailchimp, and SEO. Unit and integration tested with Jest. Deployed on Linux with Docker, Nomad, Traefik, Consul, and GitHub Actions CI/CD.\",\n      \"url\": \"https://boot-events.com\",\n      \"technologies\": [\n        \"Node.js\", \"nest.js\", \"Next.js\", \"MySQL\", \"Docker\",\n        \"REST APIs & Webhooks\", \"WebSockets\", \"Stripe Payment Gateway\",\n        \"Jest\", \"Linux Server (Ubuntu)\", \"Nomad\", \"Traefik\",\n        \"Consul\", \"CI/CD (GitHub Actions)\", \"Mailchimp\", \"SEO\"\n      ]\n    },\n    {\n      \"title\": \"Seebucht Grunewald — Company Website\",\n      \"description\": \"Corporate web app built from scratch with Node.js, Express.js, Next.js, Prisma, and PostgreSQL. REST APIs, WebSockets, Jest testing, CI/CD, and Nomad orchestration — owned end-to-end.\",\n      \"url\": \"https://seebucht-grunewald.de\",\n      \"technologies\": [\n        \"Node.js\", \"Express.js\", \"Next.js\", \"Prisma\", \"PostgreSQL\",\n        \"REST APIs\", \"WebSockets\", \"Jest\", \"Docker\",\n        \"Linux Server (Ubuntu)\", \"Nomad\", \"Traefik\", \"CI/CD (GitHub Actions)\"\n      ]\n    },\n    {\n      \"title\": \"Website Development & Improvement — Styleziba\",\n      \"description\": \"Rebuilt e-commerce platform with Laravel, express.js, vue.js, and Next.js,. Added installments, payments, staff tools, advanced search, SEO, caching, queues, and media processing.\",\n      \"url\": \"https://styleziba.com (currently unavailable due to regional internet restrictions in Iran)\",\n      \"technologies\": [\n        \"Laravel\", \"Next.js\", \"express.js\", \"Vue 3\", \"REST APIs\",\n        \"Cron & Queues\", \"Performance\", \"Caching\", \"DB Tuning\", \"SEO\"\n      ]\n    },\n    {\n      \"title\": \"Al-taqwa University\",\n      \"description\": \"Upgraded backend from Laravel 5 to Laravel 11. Added role-based access control, improved security, performance, SEO, and modernized database design.\",\n      \"url\": \"https://altaqwa.edu.af/\",\n      \"technologies\": [\n        \"Laravel 11\", \"next.js\", \"Role-Based Permissions\",\n        \"Security\", \"Performance\", \"SEO\", \"Database Design\"\n      ]\n    }\n  ],\n  \"skills\": {\n    \"programmingLanguages\": [\n      \"Node.js\", \"TypeScript\", \"JavaScript\",\n      \"Python\", \"PHP\", \"Java\", \"SQL\"\n    ],\n    \"frameworksLibraries\": [\n      \"Next.js\", \"Express.js\", \"Prisma\", \"React.js\",\n      \"Laravel\", \"Vue 3\", \"Tailwind CSS\", \"HTML5/CSS/SCSS\"\n    ],\n    \"testing\": [\n      \"Jest\", \"Unit Testing\", \"Integration Testing\"\n    ],\n    \"databasesStorage\": [\n      \"PostgreSQL\", \"MySQL\", \"MongoDB\"\n    ],\n    \"cloudDevOps\": [\n      \"Docker\", \"Kubernetes\", \"Nomad\", \"Terraform\",\n      \"Traefik\", \"Consul\", \"Git\", \"CI/CD (GitHub Actions)\",\n      \"Linux Server (Ubuntu)\"\n    ],\n    \"architectureMethods\": [\n      \"Microservices\", \"RESTful APIs\", \"WebSockets\",\n      \"Webhooks\", \"MVC\", \"Object-Oriented Programming\", \"API Design\"\n    ]\n  },\n  \"languages\": [\n    { \"name\": \"Persian\", \"level\": \"Native\" },\n    { \"name\": \"English\", \"level\": \"Fluent (C1)\" },\n    { \"name\": \"German\", \"level\": \"B2 (recently completed — actively improving)\" }\n  ],\n  \"softSkills\": [\n    \"Leadership\", \"Problem Solving\", \"Communication\",\n    \"Time Management\", \"Adaptability\", \"Critical Thinking\",\n    \"Project Management\", \"Mentoring\", \"Strategic Planning\",\n    \"Cross-functional Teamwork\"\n  ],\n  \"references\": [\n    {\n      \"name\": \"Abbas Ataie\",\n      \"position\": \"CEO\",\n      \"company\": \"Tara Solutions\",\n      \"email\": \"info@tarasolutions.cloud\",\n      \"phone\": \"+93 70 306 4120\"\n    },\n    {\n      \"name\": \"Morteza Dastani\",\n      \"position\": \"CEO\",\n      \"company\": \"Upper Company\",\n      \"email\": \"info@styleziba.com\",\n      \"phone\": \"+98 915 143 5000\"\n    },\n    {\n      \"name\": \"Stratis Efthymiou\",\n      \"position\": \"Professor\",\n      \"company\": \"GISMA University of Applied Sciences\",\n      \"email\": \"Stratis.Efthymiou@gisma-education.com\",\n      \"phone\": \"\"\n    }\n  ]\n}",
+        "options": {
+          "systemMessage": "=You are an advanced, cynical Applicant Tracking System (ATS) parsing engine and automated screening algorithm configured for tech companies in Germany. Your task is to mathematically grade the candidate, Hussain Hedayati, against scraped job descriptions with zero empathy or corporate fluff.\n\nYou process evaluations based on three strict algorithmic layers:\n\n1. KNOCKOUT CHECKS (Pass/Fail): \n- Evaluate location and visa status. If the position requires presence in Germany and the resume contains \"Berlin, Germany\" and \"Valid German Work Permit\", pass this layer. \n- Evaluate language requirements. Compare the job's language demands against the candidate's profiles (Persian: Native, English: C1/Fluent, German: B2).\n\n2. TIMELINE & RECENCY WEIGHTING (Mathematical Deduction):\n- Do not just scan the \"Skills\" block. Look at the \"experience\" array timeline. \n- Calculate exact longevity for required frameworks. (Note: The candidate has used Vue 3 and Next.js heavily from Oct 2023 to the present [~2.5 years]. His prior history from 2022 and back is predominantly PHP/Laravel/Backend). \n- If a job description demands \"4+ years of experience in Vue.js\" specifically, you MUST deduct points because his total years of JavaScript/Node is 4+, but his explicit Vue timeline is ~2.5 years.\n\n3. ROLE ALIGNMENT & OVERQUALIFICATION SCRUBBING:\n- Analyze context. The candidate has a strong infrastructure background (Kubernetes, Nomad, Terraform, CI/CD) and past \"Team Lead\" experience. If the job description is a pure, mid-level product feature development role (Frontend/Full-stack), penalize the score slightly (-5% to -10%) for \"Infrastructure Overqualification\" or \"Role Misalignment\" unless the job explicitly asks for DevOps tools.\n\nSCORING MATRIX CALIBRATION:\n- 90% - 100%: Reserved for perfect alignment where industry domain (e.g., FinTech, HealthTech), exact framework longevity, and title perfectly align.\n- 75% - 89%: High-potential technical match, but has minor timeline gaps or lacks the specific niche industry domain.\n- 60% - 74%: Core language and syntax match, but notable framework recency gaps or major role orientation friction.\n- Below 60%: Automated rejection file.\n\nOutput your final judgment strictly in the requested JSON scheme. Do not wrap the JSON output in markdown fences (```json).\n\nThe Out put format must include these fields and the same format:\n{\n  \"id\": null,\n  \"status\": \"Applied\",\n  \"role\": \"Senior Frontend Engineer - Browser Extension\",\n  \"company\": \"Atolls\",\n  \"location\": \"Berlin\",\n  \"job_posting\": \"Vollzeit\",\n  \"salary\": null,\n  \"type\": \"hybrid | inperson | on-site | remote\",\n  \"description\": \"A comprehensive, clean Markdown-formatted summary of the actual core responsibilities and team mission. Do not truncate this heavily; extract all relevant operational tasks while stripping out website navigation junk, cookie banners, and employee benefits lists.\",\n  \"key_requirements\": [\n    \"Strong proficiency in TypeScript and modern web development\",\n    \"5+ years of experience in web application development\",\n    \"Experience with at least one web framework (React, Angular, Vue)\"\n  ],\n  \"interviews\": null,\n  \"resume_matching\": \"Integer Format\",\n  \"resume_alignments\" \"\",\n  \"resume_gaps\": \"\",\n  \"posting_date\": \"the date of job posting (dd/mm/yyyy) format. Today's Current Date: {{ $now.format('yyyy-MM-dd') }}\"\n}"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        -272,
+        -512
+      ],
+      "id": "47e5359f-ad03-4e5c-89d1-89180d0d9c9b",
+      "name": "AI Agent",
+      "retryOnFail": false,
+      "waitBetweenTries": 5000,
+      "maxTries": 2
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "dataTableId": {
+          "__rl": true,
+          "value": "HnMTFVdJJasKWbUI",
+          "mode": "list",
+          "cachedResultName": "job scraper locker",
+          "cachedResultUrl": "/projects/QoJ4dLFChNdbj9wb/datatables/HnMTFVdJJasKWbUI"
+        },
+        "filters": {
+          "conditions": [
+            {
+              "keyValue": "1"
+            }
+          ]
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "running": false,
+            "started_time": "2026-06-13T12:18:58"
+          },
+          "matchingColumns": [
+            "running"
+          ],
+          "schema": [
+            {
+              "id": "running",
+              "displayName": "running",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "boolean",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "started_time",
+              "displayName": "started_time",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "dateTime",
+              "readOnly": false,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.dataTable",
+      "typeVersion": 1.1,
+      "position": [
+        528,
+        -32
+      ],
+      "id": "5bc0817a-a493-439f-9644-2f733f273204",
+      "name": "Update row(s)1"
+    },
+    {
+      "parameters": {
+        "operation": "get",
+        "dataTableId": {
+          "__rl": true,
+          "value": "HnMTFVdJJasKWbUI",
+          "mode": "list",
+          "cachedResultName": "job scraper locker",
+          "cachedResultUrl": "/projects/QoJ4dLFChNdbj9wb/datatables/HnMTFVdJJasKWbUI"
+        },
+        "filters": {
+          "conditions": []
+        },
+        "limit": 1
+      },
+      "type": "n8n-nodes-base.dataTable",
+      "typeVersion": 1.1,
+      "position": [
+        -592,
+        160
+      ],
+      "id": "8a9e097f-8588-458f-bd60-9d1f8d632795",
+      "name": "Locker"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "ecbd16bf-eba9-4b57-a195-58ccee50e899",
+              "leftValue": "={{ $json.running }}",
+              "rightValue": false,
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            },
+            {
+              "id": "bcb95632-88d5-46dc-8776-ee4fefecff2a",
+              "leftValue": "={{ $now.minus({ minutes: 30 }) >= $json.started_time }}",
+              "rightValue": "=",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "or"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        -368,
+        160
+      ],
+      "id": "502f3278-29b7-4f90-8107-b1686e8e8aef",
+      "name": "Locker Condition"
+    },
+    {
+      "parameters": {
+        "operation": "get",
+        "dataTableId": {
+          "__rl": true,
+          "value": "tj3WGfCBh287XxSr",
+          "mode": "list",
+          "cachedResultName": "url queue",
+          "cachedResultUrl": "/projects/QoJ4dLFChNdbj9wb/datatables/tj3WGfCBh287XxSr"
+        },
+        "matchType": "allConditions",
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "status",
+              "keyValue": "pending"
+            },
+            {
+              "keyName": "type",
+              "condition": "isEmpty"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.dataTable",
+      "typeVersion": 1.1,
+      "position": [
+        80,
+        160
+      ],
+      "id": "691a11d1-b34e-4ae7-ac8b-dfe5d121785f",
+      "name": "Get Job Urls List"
+    },
+    {
+      "parameters": {
+        "operation": "scrape",
+        "url": "={{ $json.job_posting_url }}",
+        "requestOptions": {}
+      },
+      "type": "@mendable/n8n-nodes-firecrawl.firecrawl",
+      "typeVersion": 1,
+      "position": [
+        528,
+        160
+      ],
+      "id": "f7f69b01-ffb2-480d-8421-8a32274b5fe9",
+      "name": "Job Page Scraper",
+      "credentials": {
+        "firecrawlApi": {
+          "id": "BIpUkzI6wpBRuVd2",
+          "name": "Hussain Uni Account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "dataTableId": {
+          "__rl": true,
+          "value": "HnMTFVdJJasKWbUI",
+          "mode": "list",
+          "cachedResultName": "job scraper locker",
+          "cachedResultUrl": "/projects/QoJ4dLFChNdbj9wb/datatables/HnMTFVdJJasKWbUI"
+        },
+        "filters": {
+          "conditions": [
+            {
+              "keyValue": "1"
+            }
+          ]
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "running": true,
+            "started_time": "={{ new Date }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "running",
+              "displayName": "running",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "boolean",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "started_time",
+              "displayName": "started_time",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "dateTime",
+              "readOnly": false,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.dataTable",
+      "typeVersion": 1.1,
+      "position": [
+        -144,
+        160
+      ],
+      "id": "6b45698a-d30b-4cf2-ab32-ad3985cccc02",
+      "name": "Lock Workflow"
+    },
+    {
+      "parameters": {
+        "authentication": "basicAuth",
+        "formTitle": "Linkedin Job Descriptions and link",
+        "formDescription": "This is for Job match scoring based on my resume.",
+        "formFields": {
+          "values": [
+            {
+              "fieldLabel": "job Url",
+              "fieldName": "Job url",
+              "placeholder": "Enter job url"
+            },
+            {
+              "fieldLabel": "job Description",
+              "fieldType": "textarea",
+              "fieldName": "Job Description",
+              "placeholder": "Enter job description"
+            }
+          ]
+        },
+        "responseMode": "lastNode",
+        "options": {
+          "path": "job-linkedin"
+        }
+      },
+      "type": "n8n-nodes-base.formTrigger",
+      "typeVersion": 2.5,
+      "position": [
+        -832,
+        1104
+      ],
+      "id": "523368cb-753a-4399-82c5-baaa19cf58b3",
+      "name": "On form submission",
+      "webhookId": "028bd17b-4461-4584-b0f2-04ad49371898",
+      "credentials": {
+        "httpBasicAuth": {
+          "id": "HNQOcaOqcaMpghX9",
+          "name": "Unnamed credential"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "3eceaba5-c651-4410-8043-bba3f2c126e7",
+              "leftValue": "={{ $json['Job url'] }}",
+              "rightValue": "https",
+              "operator": {
+                "type": "string",
+                "operation": "startsWith"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        -672,
+        1104
+      ],
+      "id": "9eb28b44-c9bd-4838-beea-faed5e17c31e",
+      "name": "If2"
+    },
+    {
+      "parameters": {
+        "dataTableId": {
+          "__rl": true,
+          "value": "tj3WGfCBh287XxSr",
+          "mode": "list",
+          "cachedResultName": "url queue",
+          "cachedResultUrl": "/projects/QoJ4dLFChNdbj9wb/datatables/tj3WGfCBh287XxSr"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "type": "linkedin",
+            "job_posting_url": "={{ $('Code in JavaScript3').item.json.clean_url }}",
+            "description": "={{ $('On form submission').item.json['Job Description'] }}",
+            "status": "ready_to_match"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "job_posting_url",
+              "displayName": "job_posting_url",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "status",
+              "displayName": "status",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "description",
+              "displayName": "description",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "type",
+              "displayName": "type",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.dataTable",
+      "typeVersion": 1.1,
+      "position": [
+        304,
+        1088
+      ],
+      "id": "ce4c95a1-a380-42fe-83f4-f29dfa2253c4",
+      "name": "Linkedin Job"
+    },
+    {
+      "parameters": {
+        "operation": "completion",
+        "completionTitle": "Done!",
+        "completionMessage": "Your job stored in database successfully",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.form",
+      "typeVersion": 2.5,
+      "position": [
+        464,
+        1104
+      ],
+      "id": "ccefbd29-4a44-4e68-9491-c5bfd232c5bf",
+      "name": "Form",
+      "webhookId": "02b8f5a2-0634-410b-a805-905d42145ab4"
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "dataTableId": {
+          "__rl": true,
+          "value": "tj3WGfCBh287XxSr",
+          "mode": "list",
+          "cachedResultName": "url queue",
+          "cachedResultUrl": "/projects/QoJ4dLFChNdbj9wb/datatables/tj3WGfCBh287XxSr"
+        },
+        "filters": {
+          "conditions": [
+            {
+              "keyValue": "={{ $('Loop Over Items').item.json.id }}"
+            }
+          ]
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "status": "ready_to_match",
+            "description": "={{ $json.for_notion }}",
+            "llm_description": "={{ $json.for_matching }}",
+            "type": "generic",
+            "job_posting_url": "={{ $('Loop Over Items').item.json.job_posting_url }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "job_posting_url",
+              "displayName": "job_posting_url",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "status",
+              "displayName": "status",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "description",
+              "displayName": "description",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "llm_description",
+              "displayName": "llm_description",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "type",
+              "displayName": "type",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.dataTable",
+      "typeVersion": 1.1,
+      "position": [
+        1456,
+        240
+      ],
+      "id": "598f8c3d-563c-42cb-8e1b-b44cc49e306d",
+      "name": "Update row(s)2"
+    },
+    {
+      "parameters": {
+        "content": "## Job posting store \n",
+        "height": 432,
+        "width": 784
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -896,
+        528
+      ],
+      "typeVersion": 1,
+      "id": "257d514b-bb55-41c3-a7bf-e4a94a44eab5",
+      "name": "Sticky Note"
+    },
+    {
+      "parameters": {
+        "content": "## Scraping job data\n",
+        "height": 528,
+        "width": 2548,
+        "color": "#675151"
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -896,
+        -64
+      ],
+      "typeVersion": 1,
+      "id": "a5a1987f-71b0-41c7-b7f7-3559a762c0bf",
+      "name": "Sticky Note1"
+    },
+    {
+      "parameters": {
+        "content": "## LInkedin Job Description Stroe\n",
+        "height": 256,
+        "width": 1668,
+        "color": "#4E6883"
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -896,
+        1024
+      ],
+      "typeVersion": 1,
+      "id": "1d0073d9-aed9-4f87-85da-78b8a2cd9156",
+      "name": "Sticky Note3"
+    },
+    {
+      "parameters": {
+        "operation": "get",
+        "dataTableId": {
+          "__rl": true,
+          "value": "tj3WGfCBh287XxSr",
+          "mode": "list",
+          "cachedResultName": "url queue",
+          "cachedResultUrl": "/projects/QoJ4dLFChNdbj9wb/datatables/tj3WGfCBh287XxSr"
+        },
+        "matchType": "allConditions",
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "status",
+              "keyValue": "ready_to_match"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.dataTable",
+      "typeVersion": 1.1,
+      "position": [
+        -688,
+        -528
+      ],
+      "id": "cc0479e9-a9f4-47a3-9fb3-5aaeb4f33c1a",
+      "name": "Get row(s)"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        -512,
+        -528
+      ],
+      "id": "40a2460b-0844-4921-9681-6905d22c0c13",
+      "name": "Loop Over Items1"
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "minutes"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.3,
+      "position": [
+        -912,
+        -528
+      ],
+      "id": "c8de425f-b2d2-4e64-b61d-01a1b7bee929",
+      "name": "Resume Matching"
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "minutes",
+              "minutesInterval": 2
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.3,
+      "position": [
+        -816,
+        160
+      ],
+      "id": "4f382f2d-b54a-4a8d-80e6-b86643c1d2ba",
+      "name": "Job Scraping"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.data.markdown }}",
+        "options": {
+          "systemMessage": "You are an advanced data extraction engine. Analyze the raw web scrape and output ONLY a valid JSON object. Strip out all tracking codes, platform navigation, and website footer noise. Do not include markdown code block syntax (```json).\n\nOutput strictly this JSON structure:\n\n{\n  \"resume_matching_payload\": \"A highly dense, space-separated string containing ONLY technical keywords, mandatory frameworks, required years of experience, languages, and core engineering responsibilities. Remove all adjectives, pleasantries, and transition words.\",\n  \"interview_prep_payload\": \"The complete, unabridged original text of the job description, including the company introduction, cultural values, specific task bullet points, and benefits. Do not summarize this section; keep it fully intact for human reading.\"\n}"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        992,
+        48
+      ],
+      "id": "21c4ebe4-aac8-4d09-81ef-abab54b57d86",
+      "name": "AI Agent1"
+    },
+    {
+      "parameters": {
+        "modelName": "models/gemini-2.5-flash",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1.1,
+      "position": [
+        992,
+        256
+      ],
+      "id": "d01d5d36-c252-4c86-8bd1-dc26dff36b7c",
+      "name": "Google Gemini Chat Model1",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "NT1kYZCAKqEI9tyC",
+          "name": "Najma"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// 1. Safe extraction of the output property from the incoming n8n item\nlet rawOutput = $input.first().json.output; \n\nlet parsedData = {};\n\nif (rawOutput) {\n  try {\n    if (typeof rawOutput === 'object') {\n      parsedData = rawOutput;\n    } else {\n      let cleanString = rawOutput.trim();\n      \n      // Look for the first '{' and the last '}' to isolate the JSON block.\n      // This completely ignores any ```json or trailing markdown characters.\n      const firstBrace = cleanString.indexOf('{');\n      const lastBrace = cleanString.lastIndexOf('}');\n      \n      if (firstBrace !== -1 && lastBrace !== -1 && lastBrace > firstBrace) {\n        cleanString = cleanString.substring(firstBrace, lastBrace + 1);\n      }\n      \n      // Safely parse the clean, isolated JSON object\n      parsedData = JSON.parse(cleanString);\n    }\n  } catch (error) {\n    // Log the error natively inside your n8n execution console for debugging\n    console.error(\"JSON parsing failed in Code Node:\", error.message);\n  }\n}\n\n// 2. Return the separated fields as distinct root-level keys\nreturn {\n  json: {\n    for_matching: parsedData.resume_matching_payload || \"Error parsing match data\",\n    for_notion: parsedData.interview_prep_payload || \"Error parsing notion data\"\n  }\n};"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1312,
+        176
+      ],
+      "id": "2613b554-f41d-4f43-b9d1-034a8fae3574",
+      "name": "Code in JavaScript2"
+    },
+    {
+      "parameters": {
+        "jsCode": "let url = $('On form submission').first().json['Job url']\nlet clean_url = url.split('?')[0]\n\nreturn [\n  {\n    json:{\n      clean_url: clean_url.replace(/\\/$/, '')\n    } \n  }\n]"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -400,
+        1088
+      ],
+      "id": "4d19f121-b956-4eef-b286-db255c9c7563",
+      "name": "Code in JavaScript3"
+    },
+    {
+      "parameters": {
+        "operation": "get",
+        "dataTableId": {
+          "__rl": true,
+          "value": "tj3WGfCBh287XxSr",
+          "mode": "list",
+          "cachedResultName": "url queue",
+          "cachedResultUrl": "/projects/QoJ4dLFChNdbj9wb/datatables/tj3WGfCBh287XxSr"
+        },
+        "matchType": "allConditions",
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "job_posting_url",
+              "keyValue": "={{ $json.clean_url }}"
+            }
+          ]
+        },
+        "limit": 1
+      },
+      "type": "n8n-nodes-base.dataTable",
+      "typeVersion": 1.1,
+      "position": [
+        -144,
+        1104
+      ],
+      "id": "c9bb4aea-8191-4a25-87db-1ac7e682b388",
+      "name": "Get row(s)1",
+      "alwaysOutputData": true
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "6052ba24-2e06-444a-bcab-4a8824010c12",
+              "leftValue": "={{ $json.id }}",
+              "rightValue": null,
+              "operator": {
+                "type": "number",
+                "operation": "empty",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        64,
+        1104
+      ],
+      "id": "2846d275-17cd-4820-82d6-c379f504743a",
+      "name": "If3"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Telegram Trigger": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "Insert row1",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Send a text message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript": {
+      "main": [
+        [
+          {
+            "node": "If1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If1": {
+      "main": [
+        [
+          {
+            "node": "Create a database page",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Send a text message1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create a database page": {
+      "main": [
+        [
+          {
+            "node": "Insert row",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Insert row": {
+      "main": [
+        [
+          {
+            "node": "Send a text message2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Insert row1": {
+      "main": [
+        []
+      ]
+    },
+    "Loop Over Items": {
+      "main": [
+        [
+          {
+            "node": "Update row(s)1",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Job Page Scraper",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send a text message2": {
+      "main": [
+        [
+          {
+            "node": "Update row(s)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send a text message1": {
+      "main": [
+        [
+          {
+            "node": "Update row(s)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Update row(s)": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript1": {
+      "main": [
+        [
+          {
+            "node": "AI Agent1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Locker": {
+      "main": [
+        [
+          {
+            "node": "Locker Condition",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Locker Condition": {
+      "main": [
+        [],
+        [
+          {
+            "node": "Lock Workflow",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Job Urls List": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Job Page Scraper": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Lock Workflow": {
+      "main": [
+        [
+          {
+            "node": "Get Job Urls List",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Update row(s)1": {
+      "main": [
+        []
+      ]
+    },
+    "On form submission": {
+      "main": [
+        [
+          {
+            "node": "If2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If2": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript3",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        []
+      ]
+    },
+    "Linkedin Job": {
+      "main": [
+        [
+          {
+            "node": "Form",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Update row(s)2": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get row(s)": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Loop Over Items1": {
+      "main": [
+        [],
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Resume Matching": {
+      "main": [
+        [
+          {
+            "node": "Get row(s)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Job Scraping": {
+      "main": [
+        [
+          {
+            "node": "Locker",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent1": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat Model1": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent1",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript2": {
+      "main": [
+        [
+          {
+            "node": "Update row(s)2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript3": {
+      "main": [
+        [
+          {
+            "node": "Get row(s)1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get row(s)1": {
+      "main": [
+        [
+          {
+            "node": "If3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If3": {
+      "main": [
+        [
+          {
+            "node": "Linkedin Job",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        []
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "versionId": "26e9b68a-efbe-444e-a083-09b84f4a3ff2",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "183e61f757ad2aded29deeea0bd8682b75b0c10c8d3acb86f3b90fa6e1dc1da1"
+  },
+  "id": "Yp01YsvLVaCD9K3B",
+  "tags": []
+}
