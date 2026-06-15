@@ -375,7 +375,7 @@ without fabricating experience.
 
 ## Workflow
 
-![Job Scoring Workflow](screen shots/job scoring workflow.png)
+![Job Scoring Workflow](screenshots/job-scoring-workflow.png)
 
 ## Job Database
 
