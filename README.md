@@ -1,146 +1,342 @@
 # AI Job Hunter
 
-An AI-powered job discovery, analysis, and matching platform built with n8n, Gemini AI, Firecrawl, Notion, and Telegram.
+AI Job Hunter is an AI-powered job discovery, analysis, scoring, and resume tailoring platform built with n8n.
 
-The system automatically collects job opportunities, extracts structured information from job postings, evaluates them against a candidate profile, removes duplicates, and stores qualified opportunities for further review.
+The system automates the entire early-stage job application process:
+
+1. Collect job opportunities.
+2. Extract and clean job descriptions.
+3. Analyze requirements using AI.
+4. Score jobs against a resume.
+5. Filter low-quality opportunities.
+6. Generate ATS-optimized resumes.
+7. Store results and notify the user.
+
+The goal is simple: spend less time managing job applications and more time applying to the right opportunities.
 
 ---
 
-## Features
+# Features
 
-### Job Collection
+## Job Collection
 
 - Submit job URLs through Telegram
-- Submit LinkedIn job descriptions through a web form
-- Store opportunities in a processing queue
-- Prevent duplicate job entries
+- Submit LinkedIn jobs through a web form
+- Store jobs in a processing queue
+- Automatic duplicate detection
+- URL normalization
 
-### Job Scraping
+## Job Scraping
 
-- Automatically scrape job posting content
-- Extract clean job descriptions
-- Remove navigation, tracking data, images, and irrelevant content
-- Normalize data for AI processing
+- Automated job scraping with Firecrawl
+- Content cleanup and normalization
+- Removes:
+  - Navigation menus
+  - Tracking parameters
+  - SVG data
+  - Base64 images
+  - Website clutter
 
-### AI-Powered Analysis
+## AI Job Analysis
 
-Extracts:
+Using Gemini AI, the system extracts:
 
 - Company
 - Role
 - Location
-- Employment Type
-- Salary Information
-- Key Requirements
-- Posting Date
+- Employment type
+- Salary information
+- Posting date
+- Key requirements
+- Job summary
 
-Generates structured job metadata using Gemini AI.
+## Resume Matching
 
-### Resume Matching
-
-Analyzes:
+The system evaluates jobs against a software engineering resume and calculates:
 
 - Skills alignment
 - Experience alignment
-- Technology stack match
+- Framework alignment
 - Language requirements
 - Location requirements
+- ATS compatibility
 
-Generates a numerical match score for each opportunity.
+Output:
 
-### Opportunity Filtering
+- Resume match score
+- Missing skills
+- Strengths
+- Recommendation
 
-Only stores jobs that:
+## Opportunity Filtering
 
-- Meet a minimum match threshold
-- Were posted recently
-- Pass quality checks
+Jobs are automatically filtered based on:
 
-### Data Management
+- Match score threshold
+- Job age
+- Quality checks
 
-- Store qualified jobs in Notion
-- Track application status
-- Maintain a database of opportunities
-- Prevent duplicate processing
+Only high-quality opportunities move forward.
 
-### Notifications
+## ATS Resume Tailoring
 
-- Telegram notifications
-- Success and rejection alerts
-- Processing updates
+For qualified jobs, the system:
+
+- Retrieves the job description
+- Compares it with the resume
+- Reorders and optimizes keywords
+- Improves ATS compatibility
+- Maintains factual accuracy
+- Generates a tailored JSON resume
+
+## Storage & Tracking
+
+### Notion
+
+Stores:
+
+- Company
+- Role
+- Job URL
+- Score
+- Requirements
+- Status
+- Tailored resume link
+
+### Google Drive
+
+Stores:
+
+- Generated resumes
+- ATS-optimized resume files
+
+### Data Tables
+
+Used for:
+
+- Queue management
+- Workflow locking
+- Job processing
+- Status tracking
+
+## Notifications
+
+Telegram notifications for:
+
+- New qualified jobs
+- Rejected jobs
+- Resume generation completion
+- Workflow events
 
 ---
 
-## Architecture
+# Architecture
 
 ```text
-Job URL
-    ↓
-Queue
-    ↓
+Job Source
+    │
+    ▼
+Job Queue
+    │
+    ▼
 Firecrawl Scraper
-    ↓
+    │
+    ▼
 Content Cleanup
-    ↓
-Gemini AI Extraction
-    ↓
-Resume Matching
-    ↓
-Scoring Engine
-    ↓
+    │
+    ▼
+Gemini AI Analysis
+    │
+    ▼
+Resume Matching Engine
+    │
+    ▼
+Score Calculation
+    │
+    ▼
 Notion Database
-    ↓
+    │
+    ├─────────────► Telegram Notification
+    │
+    ▼
+Resume Tailor Workflow
+    │
+    ▼
+OpenAI Optimization
+    │
+    ▼
+Google Drive
+    │
+    ▼
+Notion Resume Link
+    │
+    ▼
 Telegram Notification
 ```
 
 ---
 
-## Tech Stack
+# Workflow Modules
 
-### Automation
+## 1. Job Collection
+
+Responsible for:
+
+- Receiving job URLs
+- Cleaning URLs
+- Duplicate checking
+- Queue insertion
+
+## 2. Job Scraping
+
+Responsible for:
+
+- Scraping job content
+- Removing noise
+- Preparing AI-friendly content
+
+## 3. Job Analysis
+
+Responsible for:
+
+- Extracting structured data
+- Identifying requirements
+- Detecting technologies
+- Calculating scores
+
+## 4. Resume Matching
+
+Responsible for:
+
+- ATS-style evaluation
+- Candidate-job comparison
+- Fit score generation
+
+## 5. Resume Tailoring
+
+Responsible for:
+
+- Resume optimization
+- Keyword alignment
+- ATS improvements
+- Resume generation
+
+---
+
+# Tech Stack
+
+## Automation
 
 - n8n
 
-### Artificial Intelligence
+## AI Models
 
 - Google Gemini
+- OpenAI GPT
 
-### Web Scraping
+## Web Scraping
 
 - Firecrawl
 
-### Data Storage
+## Databases
 
-- Notion
 - n8n Data Tables
+- Notion
 
-### Notifications
+## Storage
+
+- Google Drive
+
+## Notifications
 
 - Telegram Bot API
 
----
+## Integrations
 
-## Key Challenges Solved
-
-### Duplicate Detection
-
-Job URLs are normalized before storage to prevent duplicate entries.
-
-### Concurrency Control
-
-A workflow locking mechanism prevents multiple executions from processing the same queue simultaneously.
-
-### Content Cleaning
-
-Large amounts of noise such as navigation menus, SVG data, tracking information, and image payloads are removed before AI processing.
-
-### Resume Scoring
-
-The system evaluates job postings against a real-world software engineering profile and generates a quantitative match score.
+- Notion API
+- Google Drive API
+- Telegram API
+- Gemini API
+- OpenAI API
+- Firecrawl API
 
 ---
 
-## Example Output
+# Key Engineering Challenges
+
+## Duplicate Detection
+
+LinkedIn URLs contain tracking parameters.
+
+The system normalizes URLs before storage:
+
+```text
+https://linkedin.com/jobs/view/12345/?tracking=abc
+```
+
+becomes
+
+```text
+https://linkedin.com/jobs/view/12345
+```
+
+This prevents duplicate records.
+
+---
+
+## Workflow Locking
+
+A lock table prevents concurrent executions.
+
+Benefits:
+
+- No duplicate processing
+- No race conditions
+- No overlapping runs
+
+---
+
+## Queue-Based Processing
+
+Jobs are processed asynchronously.
+
+Benefits:
+
+- Better reliability
+- Easier recovery
+- Improved scalability
+
+---
+
+## Content Cleanup
+
+Before sending data to AI:
+
+- SVG data removed
+- Images removed
+- Tracking information removed
+- HTML noise removed
+
+This significantly reduces token usage and improves extraction quality.
+
+---
+
+## ATS Optimization
+
+The Resume Tailor workflow:
+
+- Preserves truthfulness
+- Improves keyword matching
+- Reorders priorities
+- Increases ATS compatibility
+
+without fabricating experience.
+
+---
+
+# Example Output
+
+## Job Analysis
 
 ```json
 {
@@ -158,61 +354,113 @@ The system evaluates job postings against a real-world software engineering prof
 }
 ```
 
+## Resume Output
+
+```json
+{
+  "name": "Hussain Hedayati",
+  "title": "Software Engineer",
+  "skills": [
+    "TypeScript",
+    "Node.js",
+    "Next.js",
+    "PostgreSQL"
+  ]
+}
+```
+
 ---
 
-## Workflow Highlights
+# Screenshots
 
-- Automated job collection
-- AI-based information extraction
-- Resume-to-job matching
-- Duplicate prevention
-- Queue management
-- Workflow locking
-- Telegram notifications
-- Notion integration
+## Workflow
 
----
+![Job Scoring Workflow](screen shots/job scoring workflow.png)
 
-## Screenshots
-
-### Workflow
-
-![Workflow](screenshots/workflow.png)
-
-### Notion Database
+## Job Database
 
 ![Notion Database](screenshots/notion-database.png)
 
-### Match Results
+## Resume Matching
 
-![Match Results](screenshots/match-results.png)
+![Resume Matching](screenshots/resume-matching.png)
+
+## Tailored Resume
+
+![Tailored Resume](screenshots/tailored-resume.png)
 
 ---
 
-## Future Improvements
+# Future Improvements
 
 - Next.js dashboard
 - Multi-user support
-- Resume upload and management
-- AI-generated cover letters
+- Chrome extension
+- LinkedIn integration
+- AI cover letter generation
 - Interview preparation assistant
 - Job recommendation engine
-- Analytics and reporting
+- Analytics dashboard
+- PDF resume generation
+- Email application support
 
 ---
 
-## Motivation
+# Repository Structure
 
-Searching and applying for jobs manually is repetitive and time-consuming.
-
-This project was built to automate the process of collecting, evaluating, and organizing job opportunities using modern AI and automation tools while maintaining full visibility and control over the decision-making process.
+```text
+.
+├── workflows/
+│   ├── Job Scoring.json
+│   └── Resume Tailor.json
+│
+├── screenshots/
+│   ├── workflow.png
+│   ├── notion-database.png
+│   ├── resume-matching.png
+│   └── tailored-resume.png
+│
+├── README.md
+└── .env.example
+```
 
 ---
 
-## Author
+# Setup
 
-**Hussain Hedayati**
+1. Install n8n.
+2. Import the workflows.
+3. Configure credentials:
+   - OpenAI
+   - Gemini
+   - Firecrawl
+   - Telegram
+   - Notion
+   - Google Drive
+4. Create required Data Tables.
+5. Configure environment variables.
+6. Activate workflows.
 
-- Portfolio: https://hedayat.me
-- LinkedIn: https://linkedin.com/in/hedayati1488
-- GitHub: https://github.com/hussain1488
+---
+
+# Author
+
+## Hussain Hedayati
+
+Software Engineer
+
+Portfolio: https://hedayat.me
+
+GitHub: https://github.com/Hussain1488
+
+LinkedIn: https://www.linkedin.com/in/hedayati1488/
+
+---
+
+# GitHub Repository
+
+https://github.com/Hussain1488/job-scoring
+
+---
+
+If you find this project useful, feel free to star the repository and share feedback.
